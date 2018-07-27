@@ -1,0 +1,60 @@
+LOCUS       JQ731640                 974 bp    DNA     linear   PLN 19-NOV-2012
+DEFINITION  Solanum tuberosum clone c1336 satellite St24 sequence.
+ACCESSION   JQ731640
+VERSION     JQ731640.1
+KEYWORDS    .
+SOURCE      Solanum tuberosum (potato)
+  ORGANISM  Solanum tuberosum
+            Eukaryota; Viridiplantae; Streptophyta; Embryophyta; Tracheophyta;
+            Spermatophyta; Magnoliophyta; eudicotyledons; Gunneridae;
+            Pentapetalae; asterids; lamiids; Solanales; Solanaceae;
+            Solanoideae; Solaneae; Solanum.
+REFERENCE   1  (bases 1 to 974)
+  AUTHORS   Gong,Z., Wu,Y., Koblizkova,A., Torres,G.A., Wang,K., Iovene,M.,
+            Neumann,P., Zhang,W., Novak,P., Buell,C.R., Macas,J. and Jiang,J.
+  TITLE     Repeatless and repeat-based centromeres in potato: implications for
+            centromere evolution
+  JOURNAL   Plant Cell 24 (9), 3559-3574 (2012)
+   PUBMED   22968715
+REFERENCE   2  (bases 1 to 974)
+  AUTHORS   Gong,Z., Wu,Y., Torres,G.A., Wang,K., Iovene,M., Zhang,W.,
+            Buell,R.C., Koblizkova,A., Neumann,P., Novak,P., Macas,J. and
+            Jiang,J.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (01-MAR-2012) Institute of Plant Molecular Biology,
+            Biology Centre ASCR, Branisovska 31, Ceske Budejovice 37005, Czech
+            Republic
+COMMENT     ##Assembly-Data-START##
+            Assembly Method       :: gap4 (Staden package) v. 4.11
+            Sequencing Technology :: Sanger dideoxy sequencing
+            ##Assembly-Data-END##
+FEATURES             Location/Qualifiers
+     source          1..974
+                     /organism="Solanum tuberosum"
+                     /mol_type="genomic DNA"
+                     /db_xref="taxon:4113"
+                     /clone="c1336"
+     repeat_region   1..974
+                     /note="centromeric"
+                     /rpt_type=tandem
+                     /satellite="satellite:St24"
+ORIGIN      
+        1 tgaagcacac cttcagttgc tcctcctcgc ttagttagtc ctcccacgct ccgagctatc
+       61 atccaagcat ggtgttgccc aaccgagaga tccttcaagg tgcatctgtt cccgtgcaag
+      121 gcatggaact cccttctcat catccatcca ttgggcccaa gatcctctat ccttgtgaac
+      181 actccatcaa acctttgaaa ttcgtgaatg gatagcctcg aagcaatctg tattgcatca
+      241 tcgatatcaa atgatacgat tctcacgaga gagacgatga taaatagcgg aaaacaagaa
+      301 agatagatga agagagacaa gataagaaac aattggcaac taaaggatgt attaaatcaa
+      361 ataacctcca atttagatcc taacaagcac caaatctgga taaatagaaa gacacaacaa
+      421 gaggaaacat agagcaacct aaggttatat taaacccaaa gacgtcacct agttaattca
+      481 aaaggaagca cctaactcct acgatgacct caagggactc gatatcccaa gcaaccctcg
+      541 tttctaaaca aggttcaata aaagcttacc aatctttcaa caatcagaaa agtagtttat
+      601 gtttatatcc acaatattca aaattaatct ccctaaaatg aaaccctaag acacctattc
+      661 atagtgttag gacattttac atagatgagc ccaaaagtga cccgatttgg ctaatggggg
+      721 agccaagtcg gtttcgcctt atggctcggc aatgccccca atactcggcg aggaatcatg
+      781 ttccatgcct tcgctgggga actactggaa ctttggacgg tctacggacc atcgcccaat
+      841 ccaattggca attgataatg gtcttaagct cgcccaatga gcatctttcc cattcatagc
+      901 ttcttgggcc aattggcgat cttggaacac tcgccaagga ggtttagcga gtcgccgatg
+      961 tggaagtcag ctcg
+//
+

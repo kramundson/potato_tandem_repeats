@@ -1,0 +1,242 @@
+---
+title: "2018_0709_tetraploid_kmers"
+author: "Kirk Amundson"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+sup.counts <- read.csv("histo_SRR2069942_counts.txt", header = F, sep = " ")
+head(sup.counts)
+```
+
+```{r}
+ggplot(sup.counts, aes(x = V1, y = V2)) +
+  # geom_histogram(binwidth = 1, stat = "identity") +
+  scale_x_continuous(limits = c(2, 100)) +
+  geom_line()
+```
+
+```{r}
+rb.counts <- read.csv("histo_SRR5349587_counts.txt", header = F, sep = " ")
+head(rb.counts)
+```
+
+```{r}
+ggplot(rb.counts, aes(x = V1, y = V2)) + 
+  # geom_histogram(binwidth = 1, stat = "identity") +
+  geom_line() +
+  scale_x_continuous(limits = c(1, 50))
+```
+
+```{r}
+ggplot() +
+  geom_line(data = rb.counts, aes(x = V1, y = V2), color = "red") +
+  geom_line(data = sup.counts, aes(x = V1, y = V2), color = "blue") +
+  geom_vline(xintercept = 40, color = "black") +
+  scale_x_continuous(limits = c(1, 50)) +
+  labs(x = "31-mer count", y = "31-mer volume") +
+  theme(panel.background = element_rect(fill = "white"))
+```
+
+> Can't really fit a linear regression to this. Could still detect repetitive fraction by, e.g., cutting at 40.
+
+I pooled all Superior reads and redid the k-mer count and histogram generation with Jellyfish. Plot below
+
+```{r}
+sup.all.counts <- read.csv("superior_all_counts.txt", header = F, sep = " ")
+head(sup.all.counts)
+```
+
+```{r}
+tail(sup.all.counts)
+```
+
+
+```{r}
+ggplot(filter(sup.all.counts, V1 >= 3), aes(x = V1, y = V2)) +
+  geom_line(color = "blue", size = 1.2) +
+  geom_point() +
+  geom_vline(xintercept = 90) +
+  geom_vline(xintercept = 11) +
+  scale_x_continuous(limits = c(0, 150)) +
+  labs(x = "31-mer count", y = "31-mer volume") +
+  theme(panel.background = element_rect(fill = "white"))
+```
+
+> Extrapolate genome size from 31mer distribution:
+
+```{r}
+# calculate total number of 31-mers in the non-error distribution, defined here as k-mers with volume 4 and higher
+sum(as.numeric(sup.all.counts[4:10000,1] * sup.all.counts[4:10000,2]))
+```
+
+> There are about 36.6G k-mers in this region. Next, we want to know the peak position. From the graph, it is between 11 and 12
+
+```{r}
+sup.all.counts[5:15,]
+```
+
+> Here, the peak is at 11. Then, the genome size is estimated as:
+
+```{r}
+sum(as.numeric(sup.all.counts[4:10000,1] * sup.all.counts[4:10000,2])) / 11
+3333146764 / 1e9
+```
+
+> This reads as ~3.33Gb, less than 4 * 844e6, implying that much of the 4 subgenomes are distinct at 31-mer resolution.
+Alternatively, Superior may have a slightly contracted genome relative to DM1-3. If I wanted to determine this for sure, I would
+also have to count 31-mers in DM1-3.
+
+```{r}
+(sum(as.numeric(sup.all.counts[4:10000,1] * sup.all.counts[4:10000,2])) / 11) / (4*844e6)
+```
+
+> If we assume that the nonrepetitive region is between 4 and 90, the size of the nonrepetitive region can be rougly calculated:
+
+```{r}
+sum(as.numeric(sup.all.counts[4:90,1] * sup.all.counts[4:90,2])) / 11
+2466831540 / 1e9
+2466831540 / 3333146764
+```
+
+> This is 2.46Gb or about 74% of the genome. However, you should really question whether this assumption is valid, as homozygous regions will be conflated with low copy repeats.
+For high-copy repeat analysis, I will be analyzing the most repetitive 26% (or less) fraction of the genome.
+
+What copy number defines the top 20% most repetitive 31-mers of the genome?
+
+```{r}
+# try 180 for no good reason at all
+sum(as.numeric(sup.all.counts[4:180,1] * sup.all.counts[4:180,2])) / 11
+2674351977 / 3333146764
+```
+
+> I almost nailed it! Top 20% begins at copy number 175
+
+```{r}
+(sum(as.numeric(sup.all.counts[4:175,1] * sup.all.counts[4:175,2])) / 11) / 3333146764
+```
+
+> Determining the abundance of Russet Burbank high copy k-mers in superior will be relatively easy.
+The Superior to Russet Burbank comparison will be more challenging, as the inferred single copy
+peak cannot be distinguished from erroneous k-mers.
+
+```{r}
+st24.counts.sup <- read.csv("St24_31mer_counts_Sup.txt",header=F, sep = " ")
+head(st24.counts.sup)
+```
+
+```{r}
+ggplot(filter(sup.all.counts, V1 >= 3), aes(x = V1, y = V2)) +
+  geom_line(color = "blue", size = 1.2) +
+  # geom_vline(xintercept=c(unique(st24.counts.sup$V2))) +  
+  scale_x_continuous(limits = c(0, 150)) +
+  labs(x = "31-mer count", y = "31-mer volume") +
+  theme(panel.background = element_rect(fill = "white"))
+```
+
+```{r}
+st24.counts.sup.indexed <- read.csv("St24_31mer_index_counts_sup.txt",header=F,sep=' ') %>% 
+  mutate(V5 = V2 / 59.27)
+head(st24.counts.sup.indexed)
+```
+
+```{r}
+# raw counts, will eventually want to normalize per monoploid genome to even out the discrepancy in sequencing depth
+ggplot(st24.counts.sup.indexed, aes(x = V3, y = V2)) +
+  geom_bar(stat="identity")
+```
+
+```{r}
+st24.counts.rb.indexed <- read.csv("St24_31mer_index_counts_rb.txt", header = F, sep = " ") %>% 
+  mutate(V4 = -1*V2) %>% 
+  mutate(V5 = V2 / 16.2) %>% 
+  mutate(V6 = -1*V5)
+View(st24.counts.rb.indexed)
+```
+
+```{r}
+ggplot(st24.counts.rb.indexed, aes(x = V3, y = V4)) +
+  geom_bar(stat = "identity", color = "blue") +
+  geom_bar(data = st24.counts.sup.indexed, aes(x = V3, y = V2), stat = "identity", color = "red") +
+  scale_x_continuous(breaks = seq(0,1000, by=100)) +
+  theme(panel.background = element_rect(fill = "white", color = "black"))
+```
+
+> This is not at all what I was expecting. I'm considering an exact match to a cloned monomer. In reality, there will be mismatches to the consensus.
+A more realistic approach: align mers to reference monomer, cluster, or expand exact matches to those that are within a specified edit distance.
+Nevertheless, even with only ~16x coverage of Russet burbank, a massive amplification of a portion of St24 around 375bp is already evident.
+Maybe this is a good time to use mrFAST (guaranteed alignments within a specified edit distance?)
+
+Anyway, let's plot normalize by counts per monoploid genome (based on expected homozygous coverage) and call it a day:
+
+```{r}
+ggplot(st24.counts.rb.indexed, aes(x = V3, y = V6)) +
+  geom_bar(stat = "identity", color = "blue") +
+  geom_bar(data = st24.counts.sup.indexed, aes(x = V3, y = V5), stat = "identity", color = "red") +
+  scale_x_continuous(breaks = seq(0,1000, by=100)) +
+  labs(x = "Position", y = "Normalized 31mer Count") +
+  ggtitle("St24 31mers: Superior v. Russet Burbank") + 
+  theme(panel.background = element_rect(fill = "white", color = "black"))
+```
+
+Investigate DM1-3 31mer frequency spectrum
+
+```{r}
+DM.31mers <- read.csv("DM_31_counts.txt", header = F, sep = " ")
+head(DM.31mers)
+```
+
+```{r}
+ggplot(filter(DM.31mers, V1 >= 3), aes(x=V1,y=V2)) +
+  geom_line(color = "purple") +
+  scale_x_continuous(limits = c(0,150)) +
+  labs(x = "31-mer count", y = "31-mer volume") +
+  # geom_vline(xintercept = 8) +
+  theme(panel.background = element_rect(fill = "white", color = "black"))
+```
+
+> Evidently, much of the tetraploid genome is unique at k=31, but there are a few homozygous regions remaining.
+It would be worth trying a larger k to get a frequency distribution that resembles a homozygous genome.
+
+Estimate DM1-3 genome size from 31mer frequency distribution.
+Peak is at 24. Valley between error and single copy is at 8
+
+```{r}
+sum(as.numeric(DM.mers[7:10000,1] * DM.mers[1:10001,2])) / 24 # size in bp
+(sum(as.numeric(DM.mers[7:10000,1] * DM.mers[7:10000,2])) / 24) / 1e6 # size in Mb
+(844e6 - 822.3918e6) / 844e6
+```
+
+> The 31mer estimate is about 2.56% (~20Mb) shorter than the genome size reported by PGSC (2011). Is this considered close enough?
+Compare with the 17mer distribution described in PGSC (2011)
+
+```{r}
+DM.17mers <- read.csv("DM_17_counts.txt", header = F, sep = ' ')
+head(DM.17mers)
+tail(DM.17mers)
+ggplot(filter(DM.17mers, V1 >= 3), aes(x = V1, y = V2)) +
+  geom_line(color = "red") +
+  scale_x_continuous(limits = c(0,150)) +
+  theme(panel.background = element_rect(color = "black", fill = "white")) +
+  geom_vline(xintercept = c(11,30,49))
+```
+
+> Error k-mers stop at count 11. Single copy peak is at 30. Single copy fraction stops at 49
+Estimate genome size as before
+
+```{r}
+sum(as.numeric(DM.17mers[11:10000,1] * DM.17mers[11:10000,2])) / 30
+```
+
+> Way underestimating. Probably a limitation with Jellyfish, which uses abundance 10,000 as a catch-all. There are 231,000 k-mers in this set with higher copy number than 10,000 that are being undercounted.
+Moral of the story: I'm not convinced that Jellyfish can be used to accurately infer k-mer size.
+
+After reading Chapman, Mascher et al (2015) the k-mer analysis might prove interesting after all.
+Their approach: derive a value of k that differentiates the subgenomes of hexaploid wheat, then
+use that value of k to identify k-1mers that correspond to SNP for use in POPSEQ analysis.
+

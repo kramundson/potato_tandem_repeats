@@ -1,0 +1,15 @@
+rule jellyfish_count:
+    input:
+        "data/reads/{sample}.fq"
+    output:
+        "data/counts/{sample}.jf"
+    params:
+        kmer=config["params"]["jellyfish"]["kmer_size"]
+        hash=config["params"]["jellyfish"]["hash_size"]
+        can=config["params"]["jellyfish"]["canonical"]
+        prefix= lambda x: "data/counts/{}.jf".format(x.sample)
+    threads: config["params"]["jellyfish"]["threads"]
+    shell: """
+        jellyfish count -m {params.kmer} -s {params.hash} -t {threads} \
+        {params.can} -o {params.prefix} {input}
+    """
