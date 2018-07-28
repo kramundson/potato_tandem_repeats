@@ -44,8 +44,8 @@ source  $HOME/.bashrc
 2. Clone this repo
 
 ```
-git clone https://github.com/kramundson/tetraploid_kmers
-cd tetraploid_kmers
+git clone https://github.com/kramundson/potato_tandem_repeats
+cd potato_tandem_repeats
 ```
 
 3. Build environment using kmer.yaml
