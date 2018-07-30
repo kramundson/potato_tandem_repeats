@@ -64,15 +64,18 @@ Norkotah and Norkotah are the same thing. ![alt_text](https://link.springer.com/
 of repo for instructions on installing conda environment.
 
 ```
-source activate kmer
+cd /bruno/comai/tariizumi
+source activate envs/kmer
 ```
 
 2. Download reads from NCBI SRA. Reads should be interleaved.
 
 ```
+cd potato_tandem_repeats
+mkdir data
+mkdir data/reads
 SUP="SRR5349641 SRR5349638 SRR2070067 SRR2069942 SRR2069941 SRR2069940"
 RUS="SRR5349647 SRR5349587"
-prefetch --ascp-path '/home/kramundson/.aspera/connect/bin/ascp|/home/kramundson/.aspera/connect/etc/asperaweb_id_dsa.openssh' --max-size 50000000000 $SUP $RUS
 fastq-dump --gzip -B --split-files -O data/reads -defline-seq '@$ac.$si$sg/$ri' --defline-qual '+' sra/*.sra
 ```
 
