@@ -4,6 +4,8 @@ channels:
   - r
   - defaults
 dependencies:
+  - biopython
+  - bwa=0.7.12
   - jellyfish=2.2.6
   - parallel
   - python=3.5.1

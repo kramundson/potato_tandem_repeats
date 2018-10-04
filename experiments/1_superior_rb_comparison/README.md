@@ -24,30 +24,31 @@ weak FISH signals. Chromosomes are counterstained with DAPI (blue).
 A'-D': St24 FISH signals digitally separated from panels A-D.
 
 Summary of FISH results of three centromeric repeats.
-Table adapted from Table 1 of Wang et al (2014) Genetics:
+Table adapted from Table 1 of Wang et al (2014) Genetics
+I've also included NCBI SRR run identifier numbers for cultivars with DNAseq data.
 
 |    Cultivar    |  Origin | St24 (Cen1) | St3.58 (Cen2) | St57 (Cen7) | NCBI SRR                                                          |
 |:--------------:|:-------:|:-----------:|:-------------:|:-----------:|-------------------------------------------------------------------|
-| Atlantic       | US      | 2           | 1             | 1S,2W       | SRR5349698;SRR5349578;SRR2070063;SRR2070065                       |
+| Atlantic       | US      | 2           | 1             | 1S,2W       | SRR5349578;SRR2070063;SRR2070065                                  |
 | Atzimba        | Mexico  | 1           | 4             | 1S,2W       | NA                                                                |
 | Freedom Russet | US      | 3           | 2             | 1           | NA                                                                |
 | Hindenburg     | Germany | 1           | 2             | 2S, 1W      | NA                                                                |
 | Juanita        | Mexico  | 2S, 1W      | 1             | 1           | NA                                                                |
-| Kalkaska       | US      | 3           | 2             | 1S, 1W      | SRR5349690;SRR5349579                                             |
-| Katahdin       | US      | 3           | 2             | 1S, 2W      | SRR5349689;SRR5349594                                             |
-| Kennebec       | US      | 1S, 1W      | 2             | 1           | SRR5349688;SRR5349593                                             |
+| Kalkaska       | US      | 3           | 2             | 1S, 1W      | SRR5349579                                                        |
+| Katahdin       | US      | 3           | 2             | 1S, 2W      | SRR5349594                                                        |
+| Kennebec       | US      | 1S, 1W      | 2             | 1           | SRR5349593                                                        |
 | Kerr's Pink    | UK      | 2           | 1             | 2S, 1W      | NA                                                                |
 | MegaChip       | US      | 3           | 2             | 1S, 1W      | NA                                                                |
-| Norkotah*      | US      | 2           | 2             | 1S, 2W      | SRR5349646;SRR5349581                                             |
+| Norkotah*      | US      | 2           | 2             | 1S, 2W      | SRR5349581                                                        |
 | Ranger Russet  | US      | 2           | 4             | 1S, 1W      | NA                                                                |
 | Roslin Eburu   | UK      | 1           | 2             | 3           | NA                                                                |
-| Russet Burbank | US      | 4           | 2             | 1S, 2W      | SRR5349647;SRR5349587                                             |
-| Snowden        | US      | 1S, 1W      | 2             | 1S, 1W      | SRR5349643;SRR5349577                                             |
-| Superior       | US      | 0           | 2             | 1           | SRR5349641;SRR5349638;SRR2070067;SRR2069942;SRR2069941;SRR2069940 |
+| Russet Burbank | US      | 4           | 2             | 1S, 2W      | SRR5349587                                                        |
+| Snowden        | US      | 1S, 1W      | 2             | 1S, 1W      | SRR5349577                                                        |
+| Superior       | US      | 0           | 2             | 1           | SRR5349638;SRR2070067;SRR2069942;SRR2069941;SRR2069940            |
 | White Pearl    | US      | 1           | 0             | 1           | NA                                                                |
 
-* WGS is from Russet Norkotah. I did some reading on this, and I gather that Russet
-Norkotah and Norkotah are the same thing. ![alt_text](https://link.springer.com/content/pdf/10.1007/BF02908344.pdf, "Source")
+Update: SRR entries SRR5349647, SRR5349688, SRR5349689, SRR5349690, SRR5349646, SRR5349643,
+SRR5349641 and SRR5349698 are amplicon sequencing data that should be withheld.
 
 ## Aims
 
@@ -60,31 +61,34 @@ Norkotah and Norkotah are the same thing. ![alt_text](https://link.springer.com/
 
 ### Aim 1
 
-1. Activate conda environment (for handling software dependencies). See README.md at top
-of repo for instructions on installing conda environment.
+1. Load necessary software. Install miniconda somewhere you can write to.
 
 ```
-cd /bruno/comai/tariizumi
-source activate envs/kmer
+cd /share/comailab/kramundson/bruno_move_to_share/potato_tandem_repeats
+module load sratoolkit/2.8.1-3 jellyfish/2.2.7
 ```
 
-2. Download reads from NCBI SRA. Reads should be interleaved.
+2. Download reads from NCBI SRA. Reads should be interleaved and uncompressed.
 
 ```
-cd potato_tandem_repeats
 mkdir data
 mkdir data/reads
-SUP="SRR5349641 SRR5349638 SRR2070067 SRR2069942 SRR2069941 SRR2069940"
-RUS="SRR5349647 SRR5349587"
-fastq-dump --gzip -B --split-files -O data/reads -defline-seq '@$ac.$si$sg/$ri' --defline-qual '+' sra/*.sra
-```
+SUP="SRR2069940 SRR2069941 SRR2069942 SRR2070067 SRR5349638"
+RUS="SRR5349587"
 
-3.  Concatenate all fastq files that correspond to the same sample
+# had to change this command to output interleaved uncompressed reads
+# fastq-dump --gzip -B --split-3 -O data/reads -defline-seq '@$ac.$si/$ri' --defline-qual '+' $SUP $RUS
+
+# updated fastq dump
+fastq-dump -B --split-spot -O data/reads --defline-seq '@$ac.$si/$ri' --defline-qual '+' $SUP $RUS
+``` 
+
+3. Since Superior has multiple libraries/sequencing runs, concatenate all fastq files that
+correspond to Superior. No need to do this for Russet Burbank reads.
 
 ```
 cd data/reads
-zcat SRR5349641.fastq.gz SRR5349638.fastq.gz SRR2070067.fastq.gz SRR2069942.fastq.gz SRR2069941.fastq.gz SRR2069940.fastq.gz > superior_all.fastq
-zcat SRR5349647.fastq.gz SRR5349587.fastq.gz > rb_all.fastq
+cat SRR5349638.fastq SRR2070067.fastq SRR2069942.fastq SRR2069941.fastq SRR2069940.fastq > superior_all.fastq
 ```
 
 4. Count 31mers in each set of combined fastq files. Adjust the hash size according to the
@@ -92,43 +96,44 @@ sequencing dataset at hand. This is described in the Jellyfish manual. The calcu
 are also done here as an example:
 
 * For combined Superior reads:
-    Assumed error rate: 0.01
-    Potato genome size: 844e6
-    Read length: 2 x 150
-    Number of read pairs: 166743464
-    Sequencing coverage: 2 * 150 * 166743464 / 844e6 = ~59.27x
-    Hash size: 844e6 + (844e6 * 59.27 * 0.01 * 31) = , ~16.35G. Round up to 17G.
-    
+  * Assumed error rate: 0.01
+  * Potato genome size: 844e6
+  * Read length: 2 x 150
+  * Number of read pairs: 166743464
+  * Sequencing coverage: 2 * 150 * 166743464 / 844e6 = ~59.27x
+  * Hash size: 844e6 + (844e6 * 59.27 * 0.01 * 31) = ~16.35G
+
+Round up to 17G.
+
 ```
 jellyfish count -m 31 -s 17G -t 12 -C -o data/counts/superior_counts.jf data/reads/superior_all.fastq \
     && jellyfish histo data/counts/superior_counts.jf > data/histos/superior_all_counts.txt &
 ```
 
-![alt text](URL "Superior combined 31mer counts")
+![alt text](URL "./.images/superior_31mer_histogram.png")
 
-* For combined Russet Burbank
-    Assumed error rate: 1%
-    Potato genome size: 844e6
-    Read length: 2 x 125
-    Number of reads: 54659802
-    Sequencing coverage: 2 * 125 * 54659802 / 844e6 = ~16.2x
-    Hash size: 844e6 + (844e6 * 16.2 * 0.01 * 31) = ~5.01G Round up to 6G.
-    
+* For Russet Burbank
+  * Assumed error rate: 0.01
+  * Potato genome size: 844e6
+  * Read length: 2 x 125
+  * Number of reads: 54659802
+  * Sequencing coverage: 2 * 125 * 54659802 / 844e6 = ~16.2x
+  * Hash size: 844e6 + (844e6 * 16.2 * 0.01 * 31) = ~5.01G
+
+Round up to 6G.
+
 ```
-jellyfish count -m 31 -s 6G -t 12 -C -o data/counts/rb_counts.jf data/reads/rb_all.fastq \
+jellyfish count -m 31 -s 6G -t 12 -C -o data/counts/rb_counts.jf data/reads/SRR5349587.fastq \
     && jellyfish histo data/counts/rb_counts.jf > data/histos/rb_all_counts.txt &
 ```
 
-![alt text](URL "Russet Burbank combined 31mer counts")
-
-Plotting the k-mer histogram will be useful for determining the genome size later on.
-TODO: Put k-mer histograms here.
+![alt text](URL "./.images/rb_31mer_histogram.png")
 
 5. Extract all 31mers from St24 using ```./scripts/get_kmers_in_order.py```. This script
 returns a flat .txt file of all k-mers in St24.fasta using a simple sliding window. One
 mer per line, with mers ordered by appearance (from 5' to 3') in St24. Note, to be
-compatible with Jellyfish, I keep the lexicographically smaller of the k-mer and its
-reverse complement. The script was run at the command line as follows:
+compatible with Jellyfish, I kept the lexicographically smaller of the k-mer and its
+reverse complement. Run this script at the command line as follows:
 
 ```
 python scripts/get_kmers_in_order.py -f data/St24.fasta -k 31 -o data/coord_ordered_St24_31mers.txt
@@ -140,14 +145,14 @@ This could also be done for the other known repeat families in potato.
 ```
 while read i
 do
-    jellyfish query data/counts/superior_counts.jf $i >> superor_St24_counts.fasta
+    jellyfish query data/counts/superior_counts.jf $i >> superior_St24_counts.fasta
     jellyfish query data/counts/rb_counts.jf $i >> rb_St24_counts.fasta
 done < coord_ordered_St24_31mers.txt
 ```
 
 TODO: put in these plots
 ![alt_text](URL "Comparison of Superior and Russet Burbank St24 31-mer counts")
-![alt_text](URL "Comparison of Superior and Russet Burbank St24 31-mer counts per 1x genome coverage")
+![alt_text](URL "Comparison of Superior and Russet Burbank St24 31-mer counts, normalized by input reads")
 
 From this plot, an RB-biased region near the center of the monomer is already evident. We
 can't yet say that the rest of the monomer is RB-specific, as relying on exact k-mer
