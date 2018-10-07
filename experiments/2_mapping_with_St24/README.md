@@ -46,8 +46,11 @@ wget http://solanaceae.plantbiology.msu.edu/data/S_tuberosum_Group_Phureja_mitoc
 shorten the FASTA headers from St24, chloroplast, and mitochondrion sequences.
 
 ```
-cat *.fasta | sed 's/\?/qmark_segment/g' | sed -e 's/ .\+//g' -e 's/-/_/g' \
-    > potato_ref_St24dup.fasta
+# explicitly state all files instead of shell wildcard
+cat potato_dm_v404_all_pm_un.fasta St24_duplicated.fasta \
+    S_tuberosum_Group_Phureja_chloroplast_DM1-3-516-R44.fasta \
+    S_tuberosum_Group_Phureja_mitochondrion_DM1-3-516-R44.fasta | \
+    sed 's/\?/qmark_segment/g' | sed -e 's/ .\+//g' -e 's/-/_/g' > potato_ref_St24dup.fasta
 ```
 
 4. Index the reference genome
