@@ -72,7 +72,7 @@ ln -s /share/comailab/kramundson/bruno_move_to_share/tohru_reproduce/potato_tand
 
 # aligns one library using 12 cores
 bwa mem -t 12 -R '@RG\tID:SRR2069941\tSM:Superior' potato_ref_St24dup.fasta \
-    -p SRR2069940.fastq 2> SRR2069941_aln.err | \
+    -p SRR2069941.fastq 2> SRR2069941_aln.err | \
     samtools view -b -o SRR2069941.bam -
 ```
 
